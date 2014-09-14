@@ -15,9 +15,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#ifndef DRIVERS_LOOPY_REDIS_LOOPY_REDIS_H_ 
-#define DRIVERS_LOOPY_REDIS_LOOPY_REDIS_H_ 
+#ifndef LOOPY_REDIS_H_
+#define LOOPY_REDIS_H_
 
+#include <string>
 #include "library/sys/ldriver.h"
 #include "library/sys/lpromise.h"
 #include "drivers/third_party/hiredis/hiredis.h"
@@ -48,7 +49,7 @@ class LRedis : public LDriver {
 
   void DBConnect() override {
     // store the connection data into the thread
-    redis_ = redisAsyncConnect(host_, port_); 
+    redis_ = redisAsyncConnect(host_, port_);
     redisLibeventAttach(redis_, evbase_);
   };
 
@@ -119,4 +120,4 @@ class LRedis : public LDriver {
 };
 
 }  // namespace loopy
-#endif  // DRIVERS_LOOPY_REDIS_LOOPY_REDIS_H_ 
+#endif  // LOOPY_REDIS_H_
