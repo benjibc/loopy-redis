@@ -44,12 +44,13 @@ class LRedis : public LDriver {
   ) : LDriver(thread),
       host_(host),
       port_(port),
-      redis_(nullptr)
-  {}
+      redis_(redisAsyncConnect(host_, port_))
+  {
+    DBConnect();
+  }
 
   void DBConnect() override {
     // store the connection data into the thread
-    redis_ = redisAsyncConnect(host_, port_);
     redisLibeventAttach(redis_, evbase_);
   };
 
