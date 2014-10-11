@@ -27,11 +27,42 @@
 
 namespace loopy {
 
+using std::string;
+
+class LRedisData {
+ public:
+  LRedisData() {}
+  LRedisData(redisReply* reply) {
+    type = reply->type;
+    switch(reply->type) {
+      case REDIS_REPLY_STATUS: 
+      case REDIS_REPLY_ERROR:
+        str = string(reply->str, reply->len);
+        break;
+      case REDIS_REPLY_INTEGER: 
+        integer = reply->integer;
+      case REDIS_REPLY_STRING:
+        str = string(reply->str, reply->len);
+        break;
+      default:
+        // FIXME: a lot of cases were not covered
+        throw "what the heck happend!";
+    }
+  }
+
+  // FIXME: change this to an unrestricted union so it doesn't take extra
+  // space for no reason
+  int16_t integer;
+  string str;
+  short type;
+};
+
 inline void
 LRedisCb(redisAsyncContext* redis, void* redis_reply, void* arg) {
   redisReply* reply = static_cast<redisReply*>(redis_reply);
   auto callback = static_cast<std::function<void(void*)>*>(arg);
-  (*callback)(reply);
+  // FIXME: holy shit just fix this later
+  (*callback)(new LRedisData(reply));
 }
 
 // FIXME: add some sort of voodoo proxy calling?
@@ -62,7 +93,7 @@ class LRedis : public LDriver {
     return "LRedis";
   }
   typedef std::function<void(void*)> CBSignature;
-  typedef redisReply ReturnType;
+  typedef LRedisData* ReturnType;
   typedef LPromise<LRedis> PromiseType;
   typedef std::shared_ptr<PromiseType> PromisePtr;
 
